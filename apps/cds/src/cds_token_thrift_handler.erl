@@ -2,7 +2,7 @@
 
 -behaviour(woody_server_thrift_handler).
 
--include_lib("tds_proto/include/tds_proto_storage_thrift.hrl").
+-include_lib("tds_proto/include/tds_storage_thrift.hrl").
 
 %% woody_server_thrift_handler callbacks
 -export([handle_function/4]).
