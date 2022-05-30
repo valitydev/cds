@@ -1,21 +1,13 @@
-# general
-log
+# Build artifacts
 /_build/
-*~
+*.o
+*.beam
+*.plt
+
+# Run artifacts
 erl_crash.dump
-.tags*
-*.sublime-workspace
-.DS_Store
-*_thrift.[eh]rl
-tags
+log
 
-# jenkins
-\#*
-.\#*
-.tags*
-Dockerfile
-docker-compose.yml
-
-# compile
-compile_commands.json
-
+# make stuff
+/.image.*
+Makefile.env
