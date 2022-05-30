@@ -24,15 +24,12 @@
 -export([put_card_data_3ds/1]).
 -export([get_card_data_3ds/1]).
 -export([get_session_data_3ds/1]).
--export([get_session_data_backward_compatibility/1]).
--export([get_session_card_data_backward_compatibility/1]).
 -export([recrypt/1]).
 -export([session_cleaning/1]).
 -export([refresh_sessions/1]).
 -export([put_card_data_unavailable/1]).
 -export([put_card_data_3ds_unavailable/1]).
 -export([get_card_data_unavailable/1]).
--export([get_session_card_data_unavailable/1]).
 -export([put_card_data_no_member/1]).
 -export([same_card_data_has_same_token/1]).
 -export([same_card_number_has_same_token/1]).
@@ -86,8 +83,7 @@
 
 all() ->
     [
-        {group, all_groups},
-        {group, backward_compatibility}
+        {group, all_groups}
     ].
 
 -spec groups() -> [{atom(), list(), [atom()]}].
@@ -103,27 +99,8 @@ groups() ->
             {group, general_flow},
             {group, error_map}
         ]},
-        {ets_storage_backend, [], [{group, general_flow}]},
-        {backward_compatibility, [], [
-            {riak_storage_backend, [], [
-                {group, backward_compatibility_basic_lifecycle}
-            ]},
-            {ets_storage_backend, [], [{group, backward_compatibility_basic_lifecycle}]},
-            {keyring_errors, [], [
-                init,
-                lock,
-                get_session_card_data_unavailable,
-                unlock
-            ]}
-        ]},
-        {backward_compatibility_basic_lifecycle, [], [
-            {general_flow, [], [
-                {basic_lifecycle, [sequence], [
-                    init,
-                    put_card_data,
-                    get_session_card_data_backward_compatibility
-                ]}
-            ]}
+        {ets_storage_backend, [], [
+            {group, general_flow}
         ]},
         {general_flow, [], [
             {group, basic_lifecycle},
@@ -470,36 +447,10 @@ get_session_data_3ds(C) ->
         root_url(C)
     ).
 
--spec get_session_data_backward_compatibility(config()) -> _.
-get_session_data_backward_compatibility(C) ->
-    ?SESSION_DATA_MATCH(?CARD_SEC_CODE_MATCH(?CVV)) = cds_card_v2_client:get_session_data(
-        cds_ct_utils:lookup(session),
-        root_url(C)
-    ).
-
--spec get_session_card_data_backward_compatibility(config()) -> _.
-get_session_card_data_backward_compatibility(C) ->
-    ?assertEqual(
-        cds_card_v2_client:get_test_card(?CVV),
-        cds_card_v2_client:get_session_card_data(
-            cds_ct_utils:lookup(token),
-            cds_ct_utils:lookup(session),
-            root_url(C)
-        )
-    ).
-
 -spec get_card_data_unavailable(config()) -> _.
 get_card_data_unavailable(C) ->
     try
         cds_card_v2_client:get_card_data(<<"No matter what">>, root_url(C))
-    catch
-        error:{woody_error, {external, resource_unavailable, _}} -> ok
-    end.
-
--spec get_session_card_data_unavailable(config()) -> _.
-get_session_card_data_unavailable(C) ->
-    try
-        cds_card_v2_client:get_session_card_data(<<"TOKEN">>, <<"SESSION">>, root_url(C))
     catch
         error:{woody_error, {external, resource_unavailable, _}} -> ok
     end.
