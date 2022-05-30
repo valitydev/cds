@@ -56,7 +56,7 @@ get_card_data(Token, RootUrl) ->
         EncodedCardData ->
             decode_card_data(EncodedCardData)
     catch
-        #cds_CardDataNotFound{} ->
+        throw:#cds_CardDataNotFound{} ->
             {error, card_data_not_found}
     end.
 
@@ -78,7 +78,7 @@ get_session_data(Session, RootUrl) ->
         SessionData ->
             decode_session_data(SessionData)
     catch
-        #cds_SessionDataNotFound{} ->
+        throw:#cds_SessionDataNotFound{} ->
             {error, session_data_not_found}
     end.
 
@@ -90,7 +90,7 @@ put_card(CardData, RootUrl) ->
                 bank_card => decode_bank_card(BankCard)
             }
     catch
-        #cds_InvalidCardData{reason = Reason} ->
+        throw:#cds_InvalidCardData{reason = Reason} ->
             {error, {invalid_card_data, Reason}}
     end.
 

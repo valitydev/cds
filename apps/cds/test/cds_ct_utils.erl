@@ -23,8 +23,8 @@
 
 -export_type([config/0]).
 
--define(file_path(Config, Filename), filename:join(config(data_dir, Config), Filename)).
--define(read_file(Config, Filename), file:read_file(?file_path(Config, Filename))).
+-define(FILE_PATH(Config, Filename), filename:join(config(data_dir, Config), Filename)).
+-define(READ_FILE(Config, Filename), file:read_file(?FILE_PATH(Config, Filename))).
 
 %%
 %% API
@@ -39,9 +39,9 @@ start_clear(Config) ->
     CleanConfig = config(session_cleaning_config, Config, []),
     Recrypting = config(recrypting_config, Config, []),
     ok = clean_storage(StorageConfig),
-    {ok, EncPrivateKey1} = ?read_file(Config, "enc.1.priv.json"),
+    {ok, EncPrivateKey1} = ?READ_FILE(Config, "enc.1.priv.json"),
     EncPrivateKeys = #{<<"1">> => EncPrivateKey1},
-    {ok, SigPrivateKey1} = ?read_file(Config, "sig.1.priv.json"),
+    {ok, SigPrivateKey1} = ?READ_FILE(Config, "sig.1.priv.json"),
     SigPrivateKeys = #{<<"1">> => SigPrivateKey1},
     Apps =
         genlib_app:start_application_with(scoper, [
@@ -83,8 +83,8 @@ start_clear(Config) ->
                         ssl_options => [
                             {server_name_indication, "Test Server"},
                             {verify, verify_peer},
-                            {cacertfile, ?file_path(Config, "ca.crt")},
-                            {certfile, ?file_path(Config, "client.pem")}
+                            {cacertfile, ?FILE_PATH(Config, "ca.crt")},
+                            {certfile, ?FILE_PATH(Config, "client.pem")}
                         ],
                         transport_opts => #{
                             recv_timeout => 10000,
@@ -94,9 +94,6 @@ start_clear(Config) ->
                     }},
                     {keyring_fetch_interval, 1000},
                     {health_check, #{
-                        disk => {erl_health, disk, ["/", 99]},
-                        memory => {erl_health, cg_memory, [99]},
-                        service => {erl_health, service, [<<"cds">>]},
                         keyring => {cds_health, keyring, []}
                     }}
                 ] ++ StorageConfig ++ CleanConfig ++ Recrypting

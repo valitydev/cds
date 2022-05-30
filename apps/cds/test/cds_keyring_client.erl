@@ -59,11 +59,11 @@ start_init(Threshold, RootUrl) ->
         EncryptedShares ->
             decode_encrypted_shares(EncryptedShares)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_InvalidArguments{reason = Reason} ->
+        throw:#cds_InvalidArguments{reason = Reason} ->
             {error, {invalid_arguments, Reason}}
     end.
 
@@ -82,13 +82,13 @@ validate_init(ShareholderId, Share, RootUrl) ->
         {more_keys_needed, More} ->
             {more_keys_needed, More}
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_VerificationFailed{} ->
+        throw:#cds_VerificationFailed{} ->
             {error, verification_failed};
-        #cds_OperationAborted{reason = Reason} ->
+        throw:#cds_OperationAborted{reason = Reason} ->
             {error, {operation_aborted, Reason}}
     end.
 
@@ -100,9 +100,9 @@ cancel_init(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'CancelInit', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}}
     end.
 
@@ -114,9 +114,9 @@ start_unlock(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'StartUnlock', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}}
     end.
 
@@ -135,13 +135,13 @@ confirm_unlock(ShareholderId, Share, RootUrl) ->
         {more_keys_needed, More} ->
             {more_keys_needed, More}
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_VerificationFailed{} ->
+        throw:#cds_VerificationFailed{} ->
             {error, verification_failed};
-        #cds_OperationAborted{reason = Reason} ->
+        throw:#cds_OperationAborted{reason = Reason} ->
             {error, {operation_aborted, Reason}}
     end.
 
@@ -152,7 +152,7 @@ cancel_unlock(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'CancelUnlock', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}}
     end.
 
@@ -163,7 +163,7 @@ lock(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'Lock', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}}
     end.
 
@@ -175,9 +175,9 @@ start_rotate(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'StartRotate', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}}
     end.
 
@@ -196,13 +196,13 @@ confirm_rotate(ShareholderId, Share, RootUrl) ->
         {more_keys_needed, More} ->
             {more_keys_needed, More}
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_VerificationFailed{} ->
+        throw:#cds_VerificationFailed{} ->
             {error, verification_failed};
-        #cds_OperationAborted{reason = Reason} ->
+        throw:#cds_OperationAborted{reason = Reason} ->
             {error, {operation_aborted, Reason}}
     end.
 
@@ -213,7 +213,7 @@ cancel_rotate(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'CancelRotate', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}}
     end.
 
@@ -226,11 +226,11 @@ start_rekey(Threshold, RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'StartRekey', {Threshold}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_InvalidArguments{reason = Reason} ->
+        throw:#cds_InvalidArguments{reason = Reason} ->
             {error, {invalid_arguments, Reason}}
     end.
 
@@ -249,13 +249,13 @@ confirm_rekey(ShareholderId, Share, RootUrl) ->
         {more_keys_needed, More} ->
             {more_keys_needed, More}
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_VerificationFailed{} ->
+        throw:#cds_VerificationFailed{} ->
             {error, verification_failed};
-        #cds_OperationAborted{reason = Reason} ->
+        throw:#cds_OperationAborted{reason = Reason} ->
             {error, {operation_aborted, Reason}}
     end.
 
@@ -268,9 +268,9 @@ start_rekey_validation(RootUrl) ->
         EncryptedShares ->
             decode_encrypted_shares(EncryptedShares)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}}
     end.
 
@@ -289,13 +289,13 @@ validate_rekey(ShareholderId, Share, RootUrl) ->
         {more_keys_needed, More} ->
             {more_keys_needed, More}
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidActivity{activity = Activity} ->
+        throw:#cds_InvalidActivity{activity = Activity} ->
             {error, {invalid_activity, Activity}};
-        #cds_VerificationFailed{} ->
+        throw:#cds_VerificationFailed{} ->
             {error, verification_failed};
-        #cds_OperationAborted{reason = Reason} ->
+        throw:#cds_OperationAborted{reason = Reason} ->
             {error, {operation_aborted, Reason}}
     end.
 
@@ -306,7 +306,7 @@ cancel_rekey(RootUrl) ->
     try
         cds_woody_client:call(keyring_v2, 'CancelRekey', {}, RootUrl)
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}}
     end.
 
@@ -325,9 +325,9 @@ set_current_key(NewCurrentKeyID, RootUrl) ->
         _ = cds_woody_client:call(keyring_v2, 'UpdateKeyringMeta', {Diff}, RootUrl),
         ok
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             {error, {invalid_status, Status}};
-        #cds_InvalidKeyringMeta{reason = Reason} ->
+        throw:#cds_InvalidKeyringMeta{reason = Reason} ->
             {error, {invalid_meta, Reason}}
     end.
 

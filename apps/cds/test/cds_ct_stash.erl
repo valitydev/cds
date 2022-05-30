@@ -16,18 +16,18 @@
     code_change/3
 ]).
 
--define(server_name, ?MODULE).
--define(call_timeout, 10000).
+-define(SERVER_NAME, ?MODULE).
+-define(CALL_TIMEOUT, 10000).
 
 %%% API
 
 -spec start() -> {ok, pid()} | {error, {already_started, pid()}}.
 start() ->
-    gen_server:start({local, ?server_name}, ?MODULE, [], []).
+    gen_server:start({local, ?SERVER_NAME}, ?MODULE, [], []).
 
 -spec stop() -> _.
 stop() ->
-    erlang:exit(erlang:whereis(?server_name), normal).
+    erlang:exit(erlang:whereis(?SERVER_NAME), normal).
 
 -spec put(term(), term()) -> ok.
 put(Key, Value) ->
@@ -69,4 +69,4 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 
 call(Msg) ->
-    gen_server:call(?server_name, Msg, ?call_timeout).
+    gen_server:call(?SERVER_NAME, Msg, ?CALL_TIMEOUT).
