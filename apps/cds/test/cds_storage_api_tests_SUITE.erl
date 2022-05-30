@@ -26,8 +26,6 @@
 -export([get_session_data_3ds/1]).
 -export([get_session_data_backward_compatibility/1]).
 -export([get_session_card_data_backward_compatibility/1]).
--export([get_card_data_backward_compatibility/1]).
--export([no_last_dot_in_token/1]).
 -export([recrypt/1]).
 -export([session_cleaning/1]).
 -export([refresh_sessions/1]).
@@ -108,8 +106,7 @@ groups() ->
         {ets_storage_backend, [], [{group, general_flow}]},
         {backward_compatibility, [], [
             {riak_storage_backend, [], [
-                {group, backward_compatibility_basic_lifecycle},
-                {group, backward_compatibility_data_storage}
+                {group, backward_compatibility_basic_lifecycle}
             ]},
             {ets_storage_backend, [], [{group, backward_compatibility_basic_lifecycle}]},
             {keyring_errors, [], [
@@ -127,10 +124,6 @@ groups() ->
                     get_session_card_data_backward_compatibility
                 ]}
             ]}
-        ]},
-        {backward_compatibility_data_storage, [], [
-            get_card_data_backward_compatibility,
-            no_last_dot_in_token
         ]},
         {general_flow, [], [
             {group, basic_lifecycle},
@@ -495,40 +488,6 @@ get_session_card_data_backward_compatibility(C) ->
         )
     ).
 
--spec get_card_data_backward_compatibility(config()) -> _.
-get_card_data_backward_compatibility(C) ->
-    CardData = #{
-        pan => <<"4242424242424648">>,
-        exp_date => #{month => 12, year => 3000},
-        cardholder_name => <<"Tony Stark">>,
-        cvv => <<>>
-    },
-    #{bank_card := #{token := Token}} = cds_old_cds_client:put_card(CardData, oldcds_url(C)),
-    ?assertMatch(
-        #{
-            pan := <<"4242424242424648">>,
-            exp_date := #{month := 12, year := 3000},
-            cardholder_name := <<"Tony Stark">>
-        },
-        cds_card_v2_client:get_card_data(Token, root_url(C))
-    ).
-
--spec no_last_dot_in_token(config()) -> _.
-no_last_dot_in_token(C) ->
-    CardData = #{
-        pan => <<"4242424242424648">>,
-        exp_date => #{month => 12, year => 3000},
-        cardholder_name => <<"Tony Stark">>,
-        cvv => <<>>
-    },
-    #{bank_card := #{token := Token}} =
-        cds_card_v2_client:put_card(
-            cds_card_v2_client:get_test_card(CardData, <<>>),
-            root_url(C)
-        ),
-    LastByte = binary:part(Token, {byte_size(Token), -1}),
-    ?assertNotEqual(<<".">>, LastByte).
-
 -spec get_card_data_unavailable(config()) -> _.
 get_card_data_unavailable(C) ->
     try
@@ -732,6 +691,3 @@ update_config(Key, Config, NewVal) ->
 
 root_url(C) ->
     config(root_url, C).
-
-oldcds_url(C) ->
-    config(oldcds_root_url, C).

@@ -1,8 +1,8 @@
-{application, cds , [
+{application, cds, [
     {description, "A service that does cds"},
     {vsn, "1"},
     {registered, []},
-    {mod, { cds , []}},
+    {mod, {cds, []}},
     {applications, [
         kernel,
         stdlib,
@@ -13,7 +13,6 @@
         woody,
         shamir,
         scoper,
-        damsel,
         identdocstore_proto,
         erl_health,
         msgpack,
