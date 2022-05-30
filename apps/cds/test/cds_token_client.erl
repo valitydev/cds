@@ -9,8 +9,8 @@
 %%
 
 -type result() :: cds_woody_client:result().
--type token() :: tds_proto_storage_thrift:'Token'().
--type token_id() :: tds_proto_storage_thrift:'TokenID'().
+-type token() :: tds_storage_thrift:'Token'().
+-type token_id() :: tds_storage_thrift:'TokenID'().
 
 %%
 %% API

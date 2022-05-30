@@ -450,7 +450,7 @@ get_session_data_3ds(C) ->
 -spec get_card_data_unavailable(config()) -> _.
 get_card_data_unavailable(C) ->
     try
-        cds_card_v2_client:get_card_data(<<"No matter what">>, root_url(C))
+        cds_card_v2_client:get_card_data(<<"TOKENTOKENTOKENT">>, root_url(C))
     catch
         error:{woody_error, {external, resource_unavailable, _}} -> ok
     end.

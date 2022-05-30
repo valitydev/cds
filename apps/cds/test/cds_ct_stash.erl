@@ -11,9 +11,7 @@
     init/1,
     handle_call/3,
     handle_cast/2,
-    handle_info/2,
-    terminate/2,
-    code_change/3
+    handle_info/2
 ]).
 
 -define(SERVER_NAME, ?MODULE).
@@ -39,32 +37,26 @@ get(Key) ->
 
 %%% gen_server callbacks
 
--spec init(term()) -> {ok, atom()}.
+-type state() :: map().
+
+-spec init(_) -> {ok, state()}.
 init(_) ->
     {ok, #{}}.
 
--spec handle_call(term(), pid(), atom()) -> {reply, atom(), atom()}.
+-spec handle_call(_Call, _From, state()) -> {reply, term(), state()}.
 handle_call({put, Key, Value}, _From, State) ->
     {reply, ok, State#{Key => Value}};
 handle_call({get, Key}, _From, State) ->
     Value = maps:get(Key, State, undefined),
     {reply, Value, State}.
 
--spec handle_cast(term(), atom()) -> {noreply, atom()}.
+-spec handle_cast(_Cast, state()) -> {noreply, state()}.
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
--spec handle_info(term(), atom()) -> {noreply, atom()}.
+-spec handle_info(_Info, state()) -> {noreply, state()}.
 handle_info(_Info, State) ->
     {noreply, State}.
-
--spec terminate(term(), atom()) -> atom().
-terminate(_Reason, _State) ->
-    ok.
-
--spec code_change(term(), term(), term()) -> {ok, atom()}.
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
 
 %%% Internal functions
 
