@@ -18,9 +18,7 @@
         msgpack,
         jose,
         cds_proto,
-        tds_proto,
-        prometheus,
-        prometheus_cowboy
+        tds_proto
     ]},
     {env, []},
     {modules, []},
