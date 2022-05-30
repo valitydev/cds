@@ -1,5 +1,5 @@
 {application, cds, [
-    {description, "A service that does cds"},
+    {description, "Card Data Storage"},
     {vsn, "1"},
     {registered, []},
     {mod, {cds, []}},
@@ -22,9 +22,6 @@
     ]},
     {env, []},
     {modules, []},
-    {maintainers, [
-        "Igor Savchuk <trollfred@gmail.com>"
-    ]},
     {licenses, []},
     {links, []}
 ]}.
