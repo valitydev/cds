@@ -12,7 +12,6 @@
     keyring_v2
     | keyring_storage
     | token
-    | card
     | card_v2
     | ident_doc.
 
@@ -41,8 +40,6 @@ service_path(keyring_v2) ->
     "/v2/keyring";
 service_path(keyring_storage) ->
     "/v2/keyring_storage";
-service_path(card) ->
-    "/v1/storage";
 service_path(card_v2) ->
     "/v2/storage";
 service_path(ident_doc) ->
@@ -50,13 +47,11 @@ service_path(ident_doc) ->
 
 -spec thrift_service(storage_code()) -> thrift_service().
 thrift_service(token) ->
-    {tds_proto_storage_thrift, 'TokenStorage'};
+    {tds_storage_thrift, 'TokenStorage'};
 thrift_service(keyring_v2) ->
     {cds_proto_keyring_thrift, 'KeyringManagement'};
 thrift_service(keyring_storage) ->
     {cds_proto_keyring_thrift, 'KeyringStorage'};
-thrift_service(card) ->
-    {dmsl_cds_thrift, 'Storage'};
 thrift_service(card_v2) ->
     {cds_proto_storage_thrift, 'Storage'};
 thrift_service(ident_doc) ->
@@ -65,8 +60,6 @@ thrift_service(ident_doc) ->
 -spec handler_module(storage_code()) -> hadler_spec().
 handler_module(token) ->
     {cds_token_thrift_handler, []};
-handler_module(keyring_v2) ->
-    {cds_keyring_v2_thrift_handler, []};
 handler_module(card_v2) ->
     {cds_card_v2_thrift_handler, []};
 handler_module(ident_doc) ->

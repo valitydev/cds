@@ -1,34 +1,49 @@
-# cds
+# CDS
 
-A service that does cds
+CDS stands for **C**ard **D**ata **S**torage.
 
-## Сборка
+## Building
 
-Для запуска процесса сборки достаточно выполнить просто:
+To build the project, run the following command:
 
-    make
+```bash
+$ make compile
+```
 
-Чтобы запустить полученную сборку в режиме разработки и получить стандартный [Erlang shell][2], нужно всего лишь:
+## Running
 
-    make start
+To enter the [Erlang shell][1] with the project running, run the following command:
 
-> _Хозяйке на заметку._ При этом используется стандартный Erlang релиз, собранный при помощи [relx][3] в режиме разработчика.
+```bash
+$ make rebar-shell
+```
 
-Рекомендуется вести разработку и сборку проекта в рамках локальной виртуальной среды, предоставляемой [wercker][1]. Настоятельно рекомендуется прогоны тестовых сценариев проводить только в этой среде.
+## Development environment
 
-    $ wercker dev
+### Run in a docker container
 
-> _Хозяйке на заметку._ В зависимости от вашего окружения и операционной системы вам может понадобиться [Docker Machine][4].
+You can run any of the tasks defined in the Makefile from inside of a docker container (defined in `Dockerfile.dev`) by prefixing the task name with `wc-`. To successfully build the dev container you need `Docker BuildKit` enabled. This can be accomplished by either installing [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/) locally, or exporting the `DOCKER_BUILDKIT=1` environment variable.
 
-## Документация
+#### Example
 
-Дальнейшую документацию можно почерпнуть, пройдясь по ссылкам в [соответствующем документе](doc/index.md). 
+* This command will run the `compile` task in a docker container:
+```bash
+$ make wc-compile
+```
 
-[1]: http://devcenter.wercker.com/learn/basics/the-wercker-cli.html
-[2]: http://erlang.org/doc/man/shell.html
-[3]: https://github.com/erlware/relx
-[4]: https://docs.docker.com/machine/install-machine/
+### Run in a docker-compose environment
 
-##TODO
-- Move validation map and iin map in a separate config file instead of keeping in an erlang module.
-- Move compiled thrift files from cds app folder somewhere else.
+Similarly, you can run any of the tasks defined in the Makefile from inside of a docker-compose environment (defined in `docker-compose.yaml`) by prefixing the task name with `wdeps-`. To successfully build the dev container you need `Docker BuildKit` enabled (see `Run in a docker container` section). It *may* also be necessary to export a `COMPOSE_DOCKER_CLI_BUILD=1` environment variable for `docker-compose` container builds to work properly.
+
+#### Example
+
+* This command will run the `test` task in a docker-compose environment:
+```bash
+$ make wdeps-test
+```
+
+## Documentation
+
+@TODO Please write a couple of words about what your project does and how it does it.
+
+[1]: http://erlang.org/doc/man/shell.html

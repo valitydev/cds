@@ -1,7 +1,6 @@
 -module(cds_token_tests_SUITE).
 
--include_lib("common_test/include/ct.hrl").
--include_lib("tds_proto/include/tds_proto_storage_thrift.hrl").
+-include_lib("tds_proto/include/tds_storage_thrift.hrl").
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
 

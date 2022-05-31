@@ -223,7 +223,7 @@ fetch_keyring() ->
             _ = logger:info("New keyring version received: ~p", [get_version()]),
             ok
     catch
-        #cds_InvalidStatus{status = Status} ->
+        throw:#cds_InvalidStatus{status = Status} ->
             _ = logger:error("Could not fetch keyring: ~p: ~p", [invalid_status, Status]),
             {error, {invalid_status, Status}};
         Class:Error ->

@@ -1,8 +1,8 @@
-{application, cds , [
-    {description, "A service that does cds"},
+{application, cds, [
+    {description, "Card Data Storage"},
     {vsn, "1"},
     {registered, []},
-    {mod, { cds , []}},
+    {mod, {cds, []}},
     {applications, [
         kernel,
         stdlib,
@@ -13,21 +13,15 @@
         woody,
         shamir,
         scoper,
-        damsel,
         identdocstore_proto,
         erl_health,
         msgpack,
         jose,
         cds_proto,
-        tds_proto,
-        prometheus,
-        prometheus_cowboy
+        tds_proto
     ]},
     {env, []},
     {modules, []},
-    {maintainers, [
-        "Igor Savchuk <trollfred@gmail.com>"
-    ]},
     {licenses, []},
     {links, []}
 ]}.

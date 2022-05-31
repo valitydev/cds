@@ -1,0 +1,24 @@
+ARG OTP_VERSION
+
+FROM docker.io/library/erlang:${OTP_VERSION}
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install cmake
+RUN apt-get --yes update \
+    && apt-get --yes --no-install-recommends install \
+        cmake \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install thrift compiler
+ARG THRIFT_VERSION
+ARG TARGETARCH
+RUN wget -q -O- "https://github.com/valitydev/thrift/releases/download/${THRIFT_VERSION}/thrift-${THRIFT_VERSION}-linux-${TARGETARCH}.tar.gz" \
+    | tar -xvz -C /usr/local/bin/
+
+# Set env
+ENV CHARSET=UTF-8
+ENV LANG=C.UTF-8
+
+# Set runtime
+CMD ["/bin/bash"]

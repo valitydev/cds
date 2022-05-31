@@ -2,7 +2,7 @@
 
 -behaviour(woody_server_thrift_handler).
 
--include_lib("tds_proto/include/tds_proto_storage_thrift.hrl").
+-include_lib("tds_proto/include/tds_storage_thrift.hrl").
 
 %% woody_server_thrift_handler callbacks
 -export([handle_function/4]).
@@ -19,7 +19,7 @@ handle_function(OperationID, Args, Context, Opts) ->
         fun() -> handle_function_(OperationID, Args, Context, Opts) end
     ).
 
-handle_function_('GetToken', {TokenId}, _Context, _opts) ->
+handle_function_('GetToken', {TokenId}, _Context, _Opts) ->
     try
         TokenContent = cds_token_storage:get_token(TokenId),
         Token = #tds_Token{content = TokenContent},
@@ -30,7 +30,7 @@ handle_function_('GetToken', {TokenId}, _Context, _opts) ->
         no_keyring ->
             cds_thrift_handler_utils:raise_keyring_unavailable()
     end;
-handle_function_('PutToken', {TokenId, Token}, _Context, _opts) ->
+handle_function_('PutToken', {TokenId, Token}, _Context, _Opts) ->
     try
         TokenContent = Token#tds_Token.content,
         ok = cds_token_storage:put_token(TokenId, TokenContent),
