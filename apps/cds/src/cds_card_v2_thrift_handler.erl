@@ -23,22 +23,12 @@ handle_function(OperationID, Args, Context, Opts) ->
 handle_function_('PutCard', {CardData}, _Context, _Opts) ->
     OwnCardData = decode_card_data(CardData),
     try
-        case cds_card_data:get_card_info(OwnCardData) of
-            {ok, CardInfo} ->
-                Token = put_card(OwnCardData),
-                BankCard = #cds_BankCard{
-                    token = cds_utils:encode_token(Token),
-                    bin = maps:get(iin, CardInfo),
-                    last_digits = maps:get(last_digits, CardInfo)
-                },
-                {ok, #cds_PutCardResult{
-                    bank_card = BankCard
-                }};
-            {error, ValidationError} ->
-                cds_thrift_handler_utils:raise(#cds_InvalidCardData{
-                    reason = cds_thrift_handler_utils:map_validation_error(ValidationError)
-                })
-        end
+        Token = put_card(OwnCardData),
+        {ok, #cds_PutCardResult{
+            bank_card = #cds_BankCard{
+                token = cds_utils:encode_token(Token)
+            }
+        }}
     catch
         no_keyring ->
             cds_thrift_handler_utils:raise_keyring_unavailable()
