@@ -48,6 +48,8 @@ RUN echo "#!/bin/sh" >> /entrypoint.sh && \
 
 # Setup user
 RUN groupadd --gid ${USER_GID} ${SERVICE_NAME} && \
+    mkdir /var/log/${SERVICE_NAME} && \
+    chown ${USER_UID}:${USER_GID} /var/log/${SERVICE_NAME} && \
     useradd --uid ${USER_UID} --gid ${USER_GID} -M ${SERVICE_NAME}
 USER ${SERVICE_NAME}
 
