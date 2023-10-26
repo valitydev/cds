@@ -11,12 +11,12 @@
 DOTENV := $(shell grep -v '^\#' .env)
 
 # Development images
-DEV_IMAGE_TAG = cds-dev
+DEV_IMAGE_TAG = $(TEST_CONTAINER_NAME)-dev
 DEV_IMAGE_ID = $(file < .image.dev)
 
 DOCKER ?= docker
 DOCKERCOMPOSE ?= docker-compose
-DOCKERCOMPOSE_W_ENV = DEV_IMAGE_TAG=$(DEV_IMAGE_TAG) $(DOCKERCOMPOSE)
+DOCKERCOMPOSE_W_ENV = DEV_IMAGE_TAG=$(DEV_IMAGE_TAG) $(DOCKERCOMPOSE) -f compose.yaml -f compose.tracing.yaml
 REBAR ?= rebar3
 TEST_CONTAINER_NAME ?= testrunner
 
@@ -50,7 +50,6 @@ wc-shell: dev-image
 wc-%: dev-image
 	$(DOCKER_RUN) $(DEV_IMAGE_TAG) make $*
 
-#  TODO docker compose down doesn't work yet
 wdeps-shell: dev-image
 	$(DOCKERCOMPOSE_RUN) $(TEST_CONTAINER_NAME) su; \
 	$(DOCKERCOMPOSE_W_ENV) down
@@ -99,7 +98,7 @@ format:
 clean:
 	$(REBAR) clean
 
-distclean: clean-build-image
+distclean: clean-dev-image
 	rm -rf _build
 
 test: eunit common-test
