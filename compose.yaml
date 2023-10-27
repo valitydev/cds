@@ -43,14 +43,14 @@ services:
       - ./test/riak/user.conf:/etc/riak/user.conf:ro
 
   kds:
-    image: docker.io/rbkmoney/kds:2eba263c863a3137036480718a922394a7215375
+    image: ghcr.io/valitydev/kds:sha-f034482
     command: /opt/kds/bin/kds foreground
     volumes:
       - ./test/kds/sys.config:/opt/kds/releases/0.1.0/sys.config:ro
       - ./test/kds/ca.crt:/var/lib/kds/ca.crt:ro
       - ./test/kds/server.pem:/var/lib/kds/server.pem:ro
     healthcheck:
-      test: "curl http://localhost:8022/"
+      test: "/opt/kds/bin/kds ping"
       interval: 5s
       timeout: 1s
       retries: 20

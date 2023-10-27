@@ -18,7 +18,10 @@
         msgpack,
         jose,
         cds_proto,
-        tds_proto
+        tds_proto,
+        opentelemetry_api,
+        opentelemetry_exporter,
+        opentelemetry
     ]},
     {env, []},
     {modules, []},
