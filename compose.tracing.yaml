@@ -3,6 +3,19 @@ services:
     depends_on:
       jaeger:
         condition: service_healthy
+    environment:
+      - OTEL_SERVICE_NAME=cds
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_TRACES_SAMPLER=parentbased_always_on
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http_protobuf
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+
+  kds:
+    environment:
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_TRACES_SAMPLER=parentbased_always_off
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http_protobuf
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
 
   jaeger:
     image: jaegertracing/all-in-one:1.47
