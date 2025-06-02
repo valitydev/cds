@@ -5,6 +5,7 @@
 
 -export([set_riak_storage/1]).
 -export([set_ets_storage/1]).
+-export([set_postgres_storage/1]).
 
 -export([store/1]).
 -export([store/2]).
@@ -109,7 +110,12 @@ start_clear(Config) ->
 
 -spec stop_clear(config()) -> ok.
 stop_clear(C) ->
-    [ok = application:stop(App) || App <- config(apps, C)],
+    stop_apps(config(apps, C)).
+
+stop_apps(Apps) when is_list(Apps) ->
+    [ok = application:stop(App) || App <- Apps],
+    ok;
+stop_apps(_) ->
     ok.
 
 -spec set_riak_storage(config()) -> config().
@@ -140,6 +146,23 @@ set_riak_storage(C) ->
 set_ets_storage(C) ->
     StorageConfig = [
         {storage, cds_storage_ets}
+    ],
+    [{storage_config, StorageConfig} | C].
+
+-spec set_postgres_storage(config()) -> config().
+set_postgres_storage(C) ->
+    StorageConfig = [
+        {storage, cds_storage_pg},
+        {cds_storage_pg, #{
+            db => #{
+                host => "postgres",
+                port => 5432,
+                database => "cds",
+                username => "cds",
+                password => "password"
+            },
+            pool => 10
+        }}
     ],
     [{storage_config, StorageConfig} | C].
 
@@ -194,6 +217,8 @@ clean_storage(CdsEnv) ->
         cds_storage_riak ->
             clean_riak_storage(CdsEnv);
         cds_storage_ets ->
+            ok;
+        cds_storage_pg ->
             ok
     end.
 

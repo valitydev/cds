@@ -65,9 +65,9 @@ get_card_data(Token, RootUrl) ->
 put_card_and_session(CardData, SessionData, RootUrl) ->
     case put_card(CardData, RootUrl) of
         Result when is_map(Result) ->
-            SessionId = genlib:unique(),
-            ok = put_session(SessionId, SessionData, RootUrl),
-            maps:merge(#{session_id => SessionId}, Result);
+            SessionID = genlib:unique(),
+            ok = put_session(SessionID, SessionData, RootUrl),
+            maps:merge(#{session_id => SessionID}, Result);
         Error ->
             Error
     end.
@@ -98,9 +98,9 @@ put_card(CardData, RootUrl) ->
 put_session(SessionID, SessionData, RootUrl) ->
     call(card_v2, 'PutSession', {SessionID, encode_session_data(SessionData)}, RootUrl).
 
-encode_card_data(#{pan := Pan}) ->
+encode_card_data(#{pan := PAN}) ->
     #cds_PutCardData{
-        pan = Pan
+        pan = PAN
     }.
 
 encode_session_data(undefined) ->
@@ -151,13 +151,13 @@ decode_bank_card(
 
 decode_card_data(
     #cds_CardData{
-        pan = Pan,
+        pan = PAN,
         exp_date = ExpDate,
         cardholder_name = CardholderName
     }
 ) ->
     DecodedCardData = #{
-        pan => Pan,
+        pan => PAN,
         exp_date => decode_exp_date(ExpDate),
         cardholder_name => CardholderName
     },
