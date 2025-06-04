@@ -99,26 +99,26 @@ init_ns(NS) ->
             " data BYTEA NOT NULL, "
             " metadata BYTEA, "
             " encoding_key_id INTEGER, "
-            " salted_hash BYTEA, "
-            " created_epoch INTEGER)"
+            " hash BYTEA, "
+            " created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW())"
     ),
     ok.
 
 put_(NS, Key, Data, Meta, Indexes) ->
     Table = table(NS),
     #{
-        created_epoch := CreatedAt,
-        salted_hash := Hash,
+        created_at := CreatedAt,
+        hash := Hash,
         encoding_key_id := EncodingKey
     } = parse_indexes(Indexes),
     {ok, _} = epg_pool:query(
         ?POOL,
         "INSERT INTO " ++ Table ++
-            " (key, data, metadata, encoding_key_id, salted_hash, created_epoch)"
+            " (key, data, metadata, encoding_key_id, hash, created_at)"
             " VALUES ($1, $2, $3, $4, $5, $6)"
             " ON CONFLICT (key) DO "
-            " UPDATE SET data = $2, metadata = $3, encoding_key_id = $4, salted_hash = $5, created_epoch = $6 ",
-        [Key, Data, define(Meta), EncodingKey, Hash, CreatedAt]
+            " UPDATE SET data = $2, metadata = $3, encoding_key_id = $4, hash = $5, created_at = $6 ",
+        [Key, Data, define(Meta), EncodingKey, Hash, unixtime_to_datetime(CreatedAt)]
     ),
     ok.
 
@@ -146,8 +146,8 @@ update_(NS, Key, Data, Meta, Indexes) ->
                     ParsedOldIndexes = parse_indexes(OldIndexes),
                     ParsedIndexes = parse_indexes(Indexes),
                     #{
-                        created_epoch := CreatedAt,
-                        salted_hash := Hash,
+                        created_at := CreatedAt,
+                        hash := Hash,
                         encoding_key_id := EncodingKey
                     } = maps:merge(ParsedOldIndexes, ParsedIndexes),
                     update_query(Connection, Table, Key, Data, Meta, EncodingKey, Hash, CreatedAt)
@@ -182,7 +182,7 @@ get_keys_by_index_range_(NS, IndexName, StartValue, EndValue, Limit, Continuatio
             " AND " ++ IndexField ++
             " <= $2"
             " ORDER BY " ++ IndexField ++ LimitOffsetExpr,
-        [StartValue, EndValue]
+        [encode_index(IndexField, StartValue), encode_index(IndexField, EndValue)]
     ),
     case Result of
         {ok, _, []} ->
@@ -225,10 +225,10 @@ update_query(PoolOrConn, Table, Key, Data, Meta, EncodingKey, Hash, CreatedAt) -
             " data = $1,"
             " metadata = $2,"
             " encoding_key_id = $3,"
-            " salted_hash = $4,"
-            " created_epoch = $5"
+            " hash = $4,"
+            " created_at = $5"
             " WHERE key = $6",
-        [Data, define(Meta), EncodingKey, Hash, CreatedAt, Key]
+        [Data, define(Meta), EncodingKey, Hash, unixtime_to_datetime(CreatedAt), Key]
     ).
 
 delete_query(PoolOrConn, Table, Key) ->
@@ -250,15 +250,20 @@ limit_offset(undefined, Continuation) ->
 limit_offset(Limit, Continuation) ->
     " LIMIT " ++ integer_to_list(Limit) ++ " OFFSET " ++ integer_to_list(Continuation).
 
+encode_index("created_at", Value) ->
+    unixtime_to_datetime(Value);
+encode_index(_, Value) ->
+    Value.
+
 shift_continuation(undefined, BatchSize) ->
     BatchSize;
 shift_continuation(Continuation, BatchSize) ->
     Continuation + BatchSize.
 
 index_field({_, "created_at"}) ->
-    "created_epoch";
+    "created_at";
 index_field({_, "card_data_salted_hash"}) ->
-    "salted_hash";
+    "hash";
 index_field({_, "encoding_key_id"}) ->
     "encoding_key_id".
 
@@ -272,16 +277,16 @@ define(V, _) ->
 
 parse_indexes(Indexes) ->
     Default = #{
-        created_epoch => null,
-        salted_hash => null,
+        created_at => null,
+        hash => null,
         encoding_key_id => null
     },
     maps:fold(
         fun
             ({_, "created_at"}, V, Acc) ->
-                Acc#{created_epoch => V};
+                Acc#{created_at => V};
             ({_, "card_data_salted_hash"}, V, Acc) ->
-                Acc#{salted_hash => V};
+                Acc#{hash => V};
             ({_, "encoding_key_id"}, V, Acc) ->
                 Acc#{encoding_key_id => V}
         end,
@@ -292,9 +297,9 @@ parse_indexes(Indexes) ->
 unmarshal(#{<<"data">> := Data} = Row) ->
     Indexes = maps:fold(
         fun
-            (<<"created_epoch">>, V, Acc) ->
+            (<<"created_at">>, V, Acc) ->
                 [{{integer_index, "created_at"}, V} | Acc];
-            (<<"salted_hash">>, V, Acc) ->
+            (<<"hash">>, V, Acc) ->
                 [{{binary_index, "card_data_salted_hash"}, V} | Acc];
             (<<"encoding_key_id">>, V, Acc) ->
                 [{{integer_index, "encoding_key_id"}, V} | Acc];
@@ -353,3 +358,8 @@ daytime_to_unixtime(Daytime) ->
 
 to_unixtime(Time) when is_integer(Time) ->
     Time - ?EPOCH_DIFF.
+
+unixtime_to_datetime(null) ->
+    null;
+unixtime_to_datetime(TimestampSec) ->
+    calendar:gregorian_seconds_to_datetime(TimestampSec + ?EPOCH_DIFF).
