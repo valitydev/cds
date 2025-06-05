@@ -92,16 +92,14 @@ enable_health_logging(Check) ->
 %%
 -spec start(normal, any()) -> {ok, pid()} | {error, any()}.
 start(normal, _StartArgs) ->
-    case supervisor:start_link({local, ?MODULE}, ?MODULE, []) of
-        {ok, Sup} ->
-            NSlist = lists:flatten([
-                cds_token_storage:get_namespaces(),
-                cds_card_storage:get_namespaces(),
-                cds_ident_doc_storage:get_namespaces()
-            ]),
-            cds_storage:start(NSlist),
-            {ok, Sup}
-    end.
+    {ok, Sup} = supervisor:start_link({local, ?MODULE}, ?MODULE, []),
+    NSlist = lists:flatten([
+        cds_token_storage:get_namespaces(),
+        cds_card_storage:get_namespaces(),
+        cds_ident_doc_storage:get_namespaces()
+    ]),
+    cds_storage:start(NSlist),
+    {ok, Sup}.
 
 -spec stop(any()) -> ok.
 stop(_State) ->

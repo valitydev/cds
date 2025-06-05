@@ -90,10 +90,14 @@ all() ->
 groups() ->
     [
         {all_groups, [], [
+            {group, postgres_storage_backend},
             {group, riak_storage_backend},
             {group, ets_storage_backend},
             {group, keyring_errors},
             {group, token_check}
+        ]},
+        {postgres_storage_backend, [], [
+            {group, general_flow}
         ]},
         {riak_storage_backend, [], [
             {group, general_flow},
@@ -188,6 +192,8 @@ init_per_group(riak_storage_backend, C) ->
     cds_ct_utils:set_riak_storage(C);
 init_per_group(ets_storage_backend, C) ->
     cds_ct_utils:set_ets_storage(C);
+init_per_group(postgres_storage_backend, C) ->
+    cds_ct_utils:set_postgres_storage(C);
 init_per_group(all_groups, C) ->
     C;
 init_per_group(backward_compatibility, C) ->

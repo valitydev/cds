@@ -5,6 +5,7 @@
 
 -export([set_riak_storage/1]).
 -export([set_ets_storage/1]).
+-export([set_postgres_storage/1]).
 
 -export([store/1]).
 -export([store/2]).
@@ -109,7 +110,12 @@ start_clear(Config) ->
 
 -spec stop_clear(config()) -> ok.
 stop_clear(C) ->
-    [ok = application:stop(App) || App <- config(apps, C)],
+    stop_apps(config(apps, C)).
+
+stop_apps(Apps) when is_list(Apps) ->
+    [ok = application:stop(App) || App <- Apps],
+    ok;
+stop_apps(_) ->
     ok.
 
 -spec set_riak_storage(config()) -> config().
@@ -142,6 +148,26 @@ set_ets_storage(C) ->
         {storage, cds_storage_ets}
     ],
     [{storage_config, StorageConfig} | C].
+
+-spec set_postgres_storage(config()) -> config().
+set_postgres_storage(C) ->
+    StorageConfig = [
+        {storage, cds_storage_pg},
+        {cds_storage_pg, #{
+            db => pg_opts(),
+            pool => 10
+        }}
+    ],
+    [{storage_config, StorageConfig} | C].
+
+pg_opts() ->
+    #{
+        host => "postgres",
+        port => 5432,
+        database => "cds",
+        username => "cds",
+        password => "password"
+    }.
 
 -spec store([{any(), any()}]) -> ok.
 store(KVs) when is_list(KVs) ->
@@ -194,7 +220,9 @@ clean_storage(CdsEnv) ->
         cds_storage_riak ->
             clean_riak_storage(CdsEnv);
         cds_storage_ets ->
-            ok
+            ok;
+        cds_storage_pg ->
+            clean_pg_storage()
     end.
 
 clean_riak_storage(CdsEnv) ->
@@ -218,6 +246,23 @@ clean_riak_storage(CdsEnv) ->
         end,
         Buckets
     ),
+    ok.
+
+clean_pg_storage() ->
+    {ok, C} = epgsql:connect(pg_opts()),
+    NSList = lists:flatten([
+        cds_token_storage:get_namespaces(),
+        cds_card_storage:get_namespaces(),
+        cds_ident_doc_storage:get_namespaces()
+    ]),
+    lists:foreach(
+        fun(NS) ->
+            Table = unicode:characters_to_list(<<"\"", NS/binary, "\"">>),
+            epgsql:equery(C, "TRUNCATE TABLE " ++ Table)
+        end,
+        NSList
+    ),
+    ok = epgsql:close(C),
     ok.
 
 call(Service, Method, Args, RootUrl, Strategy) ->
