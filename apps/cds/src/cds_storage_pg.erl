@@ -79,6 +79,8 @@ start(NSList) ->
     _ = application:load(epg_connector),
     _ = application:set_env(epg_connector, databases, Databases),
     _ = application:set_env(epg_connector, pools, Pools),
+    _ = maybe_set_env(epg_connector, vault_token_path, maps:get(vault_token_path, PgOpts, undefined)),
+    _ = maybe_set_env(epg_connector, vault_role, maps:get(vault_role, PgOpts, undefined)),
     {ok, _} = application:ensure_all_started(epg_connector),
     lists:foreach(
         fun(NS) ->
@@ -363,3 +365,8 @@ unixtime_to_datetime(null) ->
     null;
 unixtime_to_datetime(TimestampSec) ->
     calendar:gregorian_seconds_to_datetime(TimestampSec + ?EPOCH_DIFF).
+
+maybe_set_env(_App, _Key, undefined) ->
+    ok;
+maybe_set_env(App, Key, Value) ->
+    application:set_env(App, Key, Value).
