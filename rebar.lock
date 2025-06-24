@@ -20,7 +20,7 @@
  {<<"ctx">>,{pkg,<<"ctx">>,<<"0.6.0">>},2},
  {<<"epg_connector">>,
   {git,"https://github.com/valitydev/epg_connector.git",
-       {ref,"4c35b8dc26955e589323c64bd1dd0c9abe1e3c13"}},
+       {ref,"d4a6cc74d2bc699d9ad325744e5348271fe3505d"}},
   0},
  {<<"epgsql">>,
   {git,"https://github.com/epgsql/epgsql.git",
