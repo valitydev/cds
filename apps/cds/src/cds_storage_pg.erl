@@ -24,6 +24,8 @@
 
 -define(EPOCH_DIFF, 62167219200).
 -define(POOL, default_pool).
+-define(VAULT_TOKEN_PATH, "/var/run/secrets/kubernetes.io/serviceaccount/token").
+-define(VAULT_ROLE, "cds").
 
 -spec put(namespace(), key(), data(), metadata(), indexes()) -> ok.
 put(NS, Key, Data, Meta, Indexes) ->
@@ -79,8 +81,9 @@ start(NSList) ->
     _ = application:load(epg_connector),
     _ = application:set_env(epg_connector, databases, Databases),
     _ = application:set_env(epg_connector, pools, Pools),
-    _ = maybe_set_env(epg_connector, vault_token_path, maps:get(vault_token_path, PgOpts, undefined)),
-    _ = maybe_set_env(epg_connector, vault_role, maps:get(vault_role, PgOpts, undefined)),
+    _ = maybe_set_env(epg_connector, vault_token_path, maps:get(vault_token_path, PgOpts, ?VAULT_TOKEN_PATH)),
+    _ = maybe_set_env(epg_connector, vault_role, maps:get(vault_role, PgOpts, ?VAULT_ROLE)),
+    logger:warning("start epg_connector with config: ~p", [application:get_all_env(epg_connector)]),
     {ok, _} = application:ensure_all_started(epg_connector),
     lists:foreach(
         fun(NS) ->
