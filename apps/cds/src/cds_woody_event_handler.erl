@@ -132,7 +132,8 @@ filter(T) when is_tuple(T) ->
 filter(M) when is_map(M) ->
     genlib_map:truemap(fun(K, V) -> {filter(K), filter(V)} end, M);
 filter(B) when is_bitstring(B) ->
-    <<"***">>;
+    %% FIXME Temporary do not filter any bitstring/binary
+    B;
 filter(P) when is_pid(P) ->
     P;
 filter(P) when is_port(P) ->
