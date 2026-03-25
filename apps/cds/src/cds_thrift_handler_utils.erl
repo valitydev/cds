@@ -58,8 +58,9 @@ filter_stacktrace_item({Module, Function, Args, Location}) when
         is_list(Location)
 ->
     {Module, Function, filter_stacktrace_args(Args), Location};
-filter_stacktrace_item(_) ->
-    '***'.
+filter_stacktrace_item(StacktraceItem) ->
+    %% FIXME Temporary do not filter any other stacktrace item
+    StacktraceItem.
 
 filter_stacktrace_args(Args) ->
     filter(Args).
