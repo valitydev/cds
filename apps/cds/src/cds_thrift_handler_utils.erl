@@ -84,5 +84,6 @@ filter(Reason) when
 ->
     Reason;
 % Other
-filter(_Reason) ->
-    '***'.
+filter(Reason) ->
+    %% FIXME Temporary do not filter any other reason
+    Reason.
